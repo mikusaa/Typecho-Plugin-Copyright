@@ -1,0 +1,296 @@
+.typecho-post-area .copyright-editor-fields {
+    --copyright-admin-border: #d9dee3;
+    --copyright-admin-border-soft: #e7ecf3;
+    --copyright-admin-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    --copyright-admin-title: #1f2937;
+    --copyright-admin-muted: #6b7280;
+    --copyright-admin-card: linear-gradient(180deg, #fafbff 0%, #f4f7fb 100%);
+    --copyright-admin-focus: rgba(147, 197, 253, 0.28);
+    margin: 16px 0 0;
+    padding: 14px 16px;
+    border: 1px solid var(--copyright-admin-border);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--copyright-admin-shadow);
+}
+
+.typecho-post-area .copyright-editor-fields__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.typecho-post-area .copyright-editor-fields__summary::-webkit-details-marker {
+    display: none;
+}
+
+.typecho-post-area .copyright-editor-fields__summary-main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.typecho-post-area .copyright-editor-fields__summary-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.typecho-post-area .copyright-editor-fields__summary-state {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.typecho-post-area .copyright-editor-fields__body {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--copyright-admin-border-soft);
+}
+
+.typecho-post-area .copyright-editor-fields__title {
+    margin: 0;
+    color: var(--copyright-admin-title);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.typecho-post-area .copyright-editor-fields__description {
+    margin: 0;
+    color: var(--copyright-admin-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.typecho-post-area .copyright-editor-fields:not([open]) .copyright-editor-fields__body {
+    display: none;
+}
+
+.typecho-post-area .copyright-editor-fields__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.typecho-post-area .copyright-editor-fields__group {
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--copyright-admin-border-soft);
+    border-radius: 10px;
+    background: var(--copyright-admin-card);
+}
+
+.typecho-post-area .copyright-editor-fields__group--full {
+    grid-column: 1 / -1;
+}
+
+.typecho-post-area .copyright-editor-fields__group-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-bottom: 10px;
+}
+
+.typecho-post-area .copyright-editor-fields__group-title {
+    margin: 0;
+    color: var(--copyright-admin-title);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.typecho-post-area .copyright-editor-fields__group-description {
+    margin: 0;
+    color: var(--copyright-admin-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.typecho-post-area .copyright-editor-fields__group-body {
+    display: grid;
+    gap: 12px;
+}
+
+.typecho-post-area .copyright-editor-field {
+    min-width: 0;
+}
+
+.typecho-post-area .copyright-editor-fields__hidden,
+.typecho-post-area .copyright-editor-field--hidden {
+    display: none !important;
+}
+
+.typecho-post-area #custom-field li.field:has([data-copyright-hidden-field="author"]),
+.typecho-post-area #custom-field tr:has([data-copyright-hidden-field="author"]) {
+    display: none;
+}
+
+.typecho-post-area .copyright-editor-field__label {
+    margin-bottom: 6px;
+}
+
+.typecho-post-area .copyright-editor-field__label .typecho-label,
+.typecho-post-area .copyright-editor-field__label label {
+    display: block;
+    margin: 0;
+    color: var(--copyright-admin-title);
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+.typecho-post-area .copyright-editor-field__meta {
+    margin: 4px 0 0;
+    color: var(--copyright-admin-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.typecho-post-area .copyright-editor-field__control {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.typecho-post-area .copyright-editor-field__control input.text,
+.typecho-post-area .copyright-editor-field__control input[type="text"],
+.typecho-post-area .copyright-editor-field__control input[type="url"],
+.typecho-post-area .copyright-editor-field__control textarea,
+.typecho-post-area .copyright-editor-field__control select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--copyright-admin-border);
+    border-radius: 10px;
+    background: #fff;
+    color: #111827;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.typecho-post-area .copyright-editor-field__control input.text,
+.typecho-post-area .copyright-editor-field__control input[type="text"],
+.typecho-post-area .copyright-editor-field__control input[type="url"] {
+    min-height: 40px;
+    padding: 9px 12px;
+}
+
+.typecho-post-area .copyright-editor-field__control textarea {
+    min-height: 108px;
+    padding: 10px 12px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.typecho-post-area .copyright-editor-field__control select {
+    height: 40px;
+    padding: 0 12px;
+}
+
+.typecho-post-area .copyright-editor-field__control input.text:hover,
+.typecho-post-area .copyright-editor-field__control input[type="text"]:hover,
+.typecho-post-area .copyright-editor-field__control input[type="url"]:hover,
+.typecho-post-area .copyright-editor-field__control textarea:hover,
+.typecho-post-area .copyright-editor-field__control select:hover {
+    border-color: #bfdbfe;
+}
+
+.typecho-post-area .copyright-editor-field__control input.text:focus,
+.typecho-post-area .copyright-editor-field__control input[type="text"]:focus,
+.typecho-post-area .copyright-editor-field__control input[type="url"]:focus,
+.typecho-post-area .copyright-editor-field__control textarea:focus,
+.typecho-post-area .copyright-editor-field__control select:focus {
+    outline: none;
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px var(--copyright-admin-focus);
+}
+
+.typecho-post-area .copyright-editor-field__control .description {
+    margin: 0;
+    color: var(--copyright-admin-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.typecho-post-area .copyright-editor-field--segmented .copyright-editor-field__control select {
+    display: none;
+}
+
+.typecho-post-area .copyright-segmented-control {
+    display: grid;
+    grid-template-columns: repeat(var(--copyright-segment-count, 3), minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+    padding: 3px;
+    border: 1px solid #d8e1ec;
+    border-radius: 10px;
+    background: #f4f7fb;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.typecho-post-area .copyright-segmented-control:focus-within {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px var(--copyright-admin-focus), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.typecho-post-area .copyright-segmented-control__item {
+    min-width: 0;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.typecho-post-area .copyright-segmented-control__item:hover {
+    color: #334155;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.typecho-post-area .copyright-segmented-control__item:focus-visible {
+    outline: none;
+    color: #1d4ed8;
+}
+
+.typecho-post-area .copyright-segmented-control__item.is-active {
+    background: #fff;
+    color: #1d4ed8;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(191, 219, 254, 0.9), 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 767px) {
+    .typecho-post-area .copyright-editor-fields__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .typecho-post-area .copyright-editor-fields__summary {
+        align-items: flex-start;
+    }
+
+    .typecho-post-area .copyright-editor-fields__summary-meta {
+        margin-top: 2px;
+    }
+
+    .typecho-post-area .copyright-editor-fields {
+        padding: 12px;
+    }
+
+    .typecho-post-area .copyright-editor-fields__group {
+        padding: 10px;
+    }
+}

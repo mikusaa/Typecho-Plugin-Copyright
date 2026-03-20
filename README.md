@@ -1,20 +1,42 @@
-# Copyright for Typecho 自用版
+# Copyright for Typecho
 
-这是一个 [Typecho](https://github.com/typecho/typecho) 插件，具体设置请看[原始文档说明](https://github.com/Yves-X/Copyright-for-Typecho)。
+这是一个用于 Typecho 的版权声明插件。
 
-## 使用方法
+当前版本聚焦于“版权声明”主功能：
 
-直接[下载仓库](https://github.com/mikusaa/Copyright-for-Typecho/archive/master.zip)，解压后，重命名为`Copyright`。
+- 支持为文章与独立页面输出统一的版权说明区块
+- 支持插件级全局默认设置
+- 支持在单篇文章或页面中进行覆盖
+- 默认自动读取当前内容作者
+- 支持版权声明内容使用 Markdown
+- 优先适配 Typecho `1.3`，同时兼容 `1.2`
 
-在原插件基础上增加了一个**封面图**的字符，修改了部分文字的显示效果。
+## 单篇字段
 
-| 字段 |类型|说明|示例|
-|:---:|:---:|:----|:----|
-|cover|字符|封面出处|封面出处的链接|
+插件会在编辑器中注册默认自定义字段，不再依赖手工输入字段名。
 
-![](https://raw.githubusercontent.com/mikusaa/Copyright-for-Typecho/dev/image.png)
+| 字段 | 说明 |
+| --- | --- |
+| `copyrightMode` | 当前内容的显示策略：跟随全局 / 本篇启用 / 本篇关闭 |
+| `copyrightSourceUrl` | 原文链接；留空时可根据全局设置显示当前内容链接 |
+| `copyrightNotice` | 当前内容的版权声明，支持 Markdown |
 
-不填写该字段即可关闭。
+## 兼容说明
 
-PS. 如果当前主题已存在`cover`字段，下载插件后将`Plugin.php`中所有的`cover`替换成你喜欢的字段，只要不重复就行了。
+- 旧版本使用的 `switch`、`author`、`url`、`notice` 字段仍会被兼容读取
+- 历史版本中已保存的 `copyrightAuthor` 字段仍会被兼容读取，但编辑界面不再提供作者入口
+- 旧版本插件配置中的 `showOnPost`、`showOnPage`、`showURL`、`notice` 仍会被兼容读取
+- 编辑器中保存一次后，旧字段会逐步迁移到新的字段命名
 
+## 结构说明
+
+- `Plugin.php` 负责插件注册、配置表单、编辑器字段注入和前台内容 hook
+- `Action.php` 负责插件的异步扩展入口，当前提供 `/action/copyright?schema=1`，为后续样式预览、CC 协议组合等能力预留接口
+
+## 后续规划
+
+当前版本已经为后续扩展预留了结构，后续可以继续增加：
+
+- 多种版权声明区块样式
+- 不同版权模板
+- CC 协议组合选择
