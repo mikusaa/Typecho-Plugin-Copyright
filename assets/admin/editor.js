@@ -21,18 +21,18 @@
     var fieldGroups = [
         {
             key: 'behavior',
-            title: '显示策略',
-            description: '控制当前内容是否显示版权声明，以及链接展示方式。',
-            fields: ['mode', 'sourceUrl']
+            title: '基础设置',
+            description: '',
+            fields: ['mode', 'sourceUrl', 'author']
         },
         {
             key: 'content',
             title: '声明内容',
-            description: '版权声明留空时回退到插件的全局默认值。',
+            description: '',
             fields: ['notice']
         }
     ];
-    var hiddenFieldKeys = ['author'];
+    var hiddenFieldKeys = [];
     var modeLabels = {
         inherit: '跟随全局',
         enabled: '本篇启用',
@@ -54,6 +54,7 @@
 
         initCollapsiblePanel($panel);
         initSegmentedModeControl($panel);
+        initOriginalAuthorField($panel);
     }
 
     function migrateLegacyFields($customField) {
@@ -62,7 +63,7 @@
         var hasUrl = !!findLegacyField($customField, 'url');
         var hasNotice = !!findLegacyField($customField, 'notice');
 
-        if (!(hasSwitch || (hasNotice && (hasAuthor || hasUrl)))) {
+        if (!(hasSwitch || hasAuthor || hasUrl || hasNotice)) {
             return;
         }
 
@@ -174,7 +175,7 @@
             '  <summary class="copyright-editor-fields__summary">' +
             '    <span class="copyright-editor-fields__summary-main">' +
             '      <span class="copyright-editor-fields__title">版权声明设置</span>' +
-            '      <span class="copyright-editor-fields__description">仅管理版权声明插件使用的字段，默认折叠显示。</span>' +
+            '      <span class="copyright-editor-fields__description">仅管理版权字段，默认折叠显示。</span>' +
             '    </span>' +
             '    <span class="copyright-editor-fields__summary-meta">' +
             '      <span class="copyright-editor-fields__summary-state" data-panel-state-text>展开设置</span>' +
@@ -189,10 +190,12 @@
 
         $.each(collectedGroups, function (_, groupData) {
             var $group = $(
-                '<section class="copyright-editor-fields__group copyright-editor-fields__group--full" data-group="' + groupData.config.key + '">' +
+                    '<section class="copyright-editor-fields__group copyright-editor-fields__group--full" data-group="' + groupData.config.key + '">' +
                 '  <div class="copyright-editor-fields__group-header">' +
                 '    <h4 class="copyright-editor-fields__group-title">' + groupData.config.title + '</h4>' +
-                '    <p class="copyright-editor-fields__group-description">' + groupData.config.description + '</p>' +
+                (groupData.config.description
+                    ? '    <p class="copyright-editor-fields__group-description">' + groupData.config.description + '</p>'
+                    : '') +
                 '  </div>' +
                 '  <div class="copyright-editor-fields__group-body"></div>' +
                 '</section>'
@@ -299,6 +302,7 @@
         var $controlWrap = $field.find('.copyright-editor-field__control').first();
         var $description = $controlWrap.find('.description').first();
         var descriptionText;
+        var fieldKey = normalizeValue($field.attr('data-copyright-field'));
         var $textControl;
 
         if (!$description.length) {
@@ -311,9 +315,20 @@
             return;
         }
 
+        if (fieldKey === 'mode') {
+            $field
+                .addClass('copyright-editor-field--inline-meta')
+                .find('.copyright-editor-field__label')
+                .append($('<p class="copyright-editor-field__meta"></p>').text(descriptionText));
+            $description.remove();
+            return;
+        }
+
         $textControl = $controlWrap.find('textarea, input[type="text"], input[type="url"], input.text').first();
         if ($textControl.length && !$textControl.attr('placeholder')) {
             $textControl.attr('placeholder', descriptionText);
+            $description.remove();
+            return;
         }
 
         $field
@@ -405,6 +420,86 @@
         });
 
         $select.on('change.copyrightSegmentedControl', sync);
+        sync();
+    }
+
+    function initOriginalAuthorField($scope) {
+        var $sourceField = $scope.find('[data-copyright-field="sourceUrl"]').first();
+        var $authorField = $scope.find('[data-copyright-field="author"]').first();
+        var $sourceInput = $sourceField.find('input[type="text"], input[type="url"], input.text').first();
+        var visibilityState = null;
+        var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+
+        if (!$sourceField.length || !$authorField.length || !$sourceInput.length) {
+            return;
+        }
+
+        $authorField.addClass('copyright-editor-field--conditional');
+
+        function toggleDependent($target, shouldShow, skipAnimation) {
+            var duration = !skipAnimation && !(motionQuery && motionQuery.matches) ? 180 : 0;
+
+            $target.stop(true, true);
+            $target.attr('aria-hidden', shouldShow ? 'false' : 'true');
+
+            if (!duration) {
+                $target.prop('hidden', !shouldShow).css({
+                    opacity: '',
+                    display: '',
+                    height: '',
+                    overflow: ''
+                });
+                return;
+            }
+
+            if (shouldShow) {
+                $target.prop('hidden', false);
+                $target
+                    .css('opacity', 0)
+                    .hide()
+                    .slideDown(duration)
+                    .animate(
+                        { opacity: 1 },
+                        {
+                            duration: duration,
+                            queue: false,
+                            complete: function () {
+                                $target.css({
+                                    opacity: '',
+                                    display: '',
+                                    height: '',
+                                    overflow: ''
+                                });
+                            }
+                        }
+                    );
+                return;
+            }
+
+            $target.animate({ opacity: 0 }, { duration: duration, queue: false });
+            $target.slideUp(duration, function () {
+                $target.prop('hidden', true).css({
+                    opacity: '',
+                    display: '',
+                    height: '',
+                    overflow: ''
+                });
+            });
+        }
+
+        function sync() {
+            var hasSourceUrl = normalizeValue($sourceInput.val()) !== '';
+            var isInitialSync = visibilityState === null;
+
+            if (visibilityState === hasSourceUrl) {
+                return;
+            }
+
+            visibilityState = hasSourceUrl;
+            toggleDependent($authorField, hasSourceUrl, isInitialSync);
+        }
+
+        $sourceInput.on('input.copyrightOriginalAuthor change.copyrightOriginalAuthor', sync);
         sync();
     }
 

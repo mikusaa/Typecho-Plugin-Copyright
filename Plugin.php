@@ -91,9 +91,9 @@ class Plugin implements PluginInterface
         $settings = self::globalSettings();
 
         echo '<div class="message notice">';
-        echo '<p><strong>版权声明插件</strong>用于为文章或独立页面输出统一的版权说明区块。</p>';
-        echo '<p>本页面配置的是<strong>全局默认设置</strong>；如需对单篇文章或页面单独覆盖，请在编辑器中的“版权声明设置”面板进行配置。</p>';
-        echo '<p>单篇设置的优先级高于全局设置。作者信息将自动读取当前内容作者；声明内容支持 Markdown 语法。</p>';
+        echo '<p><strong>版权声明插件</strong>用于为文章或独立页面输出版权说明区块。</p>';
+        echo '<p>这里配置的是<strong>全局默认设置</strong>；单篇覆盖请在编辑器中的“版权声明设置”面板中完成。</p>';
+        echo '<p>作者默认读取当前内容作者；填写原文链接后，可补充原文作者。声明内容支持 Markdown。</p>';
         echo '</div>';
 
         // 保留旧版全局 author 配置键，避免 Typecho 1.3 回填遗留配置时报错。
@@ -265,7 +265,7 @@ class Plugin implements PluginInterface
             [
                 self::MODE_INHERIT => _t('跟随全局设置'),
                 self::MODE_ENABLED => _t('本篇启用'),
-                self::MODE_DISABLED => _t('本篇关闭'),
+            self::MODE_DISABLED => _t('本篇关闭'),
             ],
             self::MODE_INHERIT,
             _t('显示策略'),
@@ -277,8 +277,8 @@ class Plugin implements PluginInterface
             self::FIELD_AUTHOR,
             null,
             null,
-            _t('作者信息（兼容保留）'),
-            _t('保留用于兼容旧数据；当前版本默认自动读取内容作者。')
+            _t('原文作者'),
+            _t('填写原文链接后可选填，留空则显示当前内容作者。')
         );
         $author->input->setAttribute('data-copyright-hidden-field', 'author');
         $layout->addItem($author);
@@ -288,7 +288,7 @@ class Plugin implements PluginInterface
             null,
             null,
             _t('原文链接'),
-            _t('填写后显示为“原文链接”；留空时可根据全局设置显示当前' . $contentLabel . '链接。')
+            _t('填写后显示原文链接，留空则按全局设置显示当前' . $contentLabel . '链接。')
         );
         $layout->addItem($sourceUrl);
 
@@ -297,7 +297,7 @@ class Plugin implements PluginInterface
             null,
             null,
             _t('版权声明'),
-            _t('支持 Markdown。留空时使用插件的全局默认值。')
+            _t('支持 Markdown，留空则使用全局默认值。')
         );
         $notice->input->setAttribute('rows', '4');
         $layout->addItem($notice);
@@ -379,6 +379,7 @@ class Plugin implements PluginInterface
         }
 
         $sourceUrl = self::normalizeUrl($local['source_url']);
+        $authorOverride = $sourceUrl === '' ? '' : $local['author'];
         $linkLabel = '';
 
         if ($sourceUrl !== '') {
@@ -392,7 +393,8 @@ class Plugin implements PluginInterface
             'enabled' => true,
             'style' => $global['style'],
             'license' => $global['license'],
-            'author' => self::firstNonEmptyText($local['author'], self::resolveAuthorText($widget)),
+            'author' => self::firstNonEmptyText($authorOverride, self::resolveAuthorText($widget)),
+            'author_label' => $authorOverride !== '' ? _t('原文作者') : _t('作者信息'),
             'source_url' => $sourceUrl,
             'link_label' => $linkLabel,
             'notice' => self::firstNonEmptyText($local['notice'], $global['default_notice']),
@@ -490,7 +492,7 @@ class Plugin implements PluginInterface
         $rows = [];
 
         if ($data['author'] !== '') {
-            $rows[] = self::renderClassicRow(_t('作者信息'), self::renderClassicValue($data['author']));
+            $rows[] = self::renderClassicRow((string) $data['author_label'], self::renderClassicValue($data['author']));
         }
 
         if ($data['source_url'] !== '' && $data['link_label'] !== '') {
@@ -700,7 +702,8 @@ class Plugin implements PluginInterface
             'licenses' => [],
             'capabilities' => [
                 'author_auto_read' => true,
-                'author_field_visible' => false,
+                'author_field_visible' => true,
+                'author_field_visibility' => 'when_source_url_present',
                 'markdown_notice' => true,
                 'permalink_fallback' => true,
                 'cc_presets' => false,
@@ -856,6 +859,7 @@ class Plugin implements PluginInterface
             'style' => self::BLOCK_STYLE_CLASSIC,
             'license' => '',
             'author' => '',
+            'author_label' => _t('作者信息'),
             'source_url' => '',
             'link_label' => '',
             'notice' => '',
