@@ -219,18 +219,87 @@
     }
 
     function initCollapsiblePanel($panel) {
+        var $summary = $panel.find('.copyright-editor-fields__summary').first();
+        var $body = $panel.find('.copyright-editor-fields__body').first();
+        var isAnimating = false;
+        var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+
         $panel.prop('open', false);
-
+        $body.prop('hidden', true);
         syncPanelStateText($panel);
+        syncPanelExpandedState($panel, $summary);
 
-        $panel.on('click', '.copyright-editor-fields__summary', function () {
-            window.setTimeout(function () {
+        function togglePanel(shouldOpen) {
+            var duration = !(motionQuery && motionQuery.matches) ? 180 : 0;
+
+            if (isAnimating || shouldOpen === $panel.prop('open')) {
+                return;
+            }
+
+            $body.stop(true, true);
+
+            if (!duration) {
+                $panel.prop('open', shouldOpen);
+                $body.prop('hidden', !shouldOpen).css({
+                    display: '',
+                    height: '',
+                    overflow: '',
+                    opacity: ''
+                });
                 syncPanelStateText($panel);
-            }, 0);
-        });
+                syncPanelExpandedState($panel, $summary);
+                return;
+            }
 
-        $panel.on('toggle', function () {
-            syncPanelStateText($panel);
+            isAnimating = true;
+
+            if (shouldOpen) {
+                $panel.prop('open', true);
+                $body.prop('hidden', false);
+                syncPanelStateText($panel);
+                syncPanelExpandedState($panel, $summary);
+
+                $body
+                    .css('opacity', 0)
+                    .hide()
+                    .slideDown(duration)
+                    .animate(
+                        { opacity: 1 },
+                        {
+                            duration: duration,
+                            queue: false,
+                            complete: function () {
+                                $body.css({
+                                    display: '',
+                                    height: '',
+                                    overflow: '',
+                                    opacity: ''
+                                });
+                                isAnimating = false;
+                            }
+                        }
+                    );
+                return;
+            }
+
+            $body.animate({ opacity: 0 }, { duration: duration, queue: false });
+            $body.slideUp(duration, function () {
+                $panel.prop('open', false);
+                $body.prop('hidden', true).css({
+                    display: '',
+                    height: '',
+                    overflow: '',
+                    opacity: ''
+                });
+                syncPanelStateText($panel);
+                syncPanelExpandedState($panel, $summary);
+                isAnimating = false;
+            });
+        }
+
+        $summary.on('click', function (event) {
+            event.preventDefault();
+            togglePanel(!$panel.prop('open'));
         });
     }
 
@@ -238,6 +307,10 @@
         $panel
             .find('[data-panel-state-text]')
             .text($panel.prop('open') ? '收起设置' : '展开设置');
+    }
+
+    function syncPanelExpandedState($panel, $summary) {
+        $summary.attr('aria-expanded', $panel.prop('open') ? 'true' : 'false');
     }
 
     function extractField($customField, fieldKey, fieldName) {
